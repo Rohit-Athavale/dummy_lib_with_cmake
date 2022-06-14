@@ -6,15 +6,24 @@ include (CMakePrintHelpers)
 set(DUMMY "dummy")
 
 project(${DUMMY})
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -O0 -Wall -Werror -fstack-clash-protection -fstack-protector -mstackrealign -g -g3")
+set(CMAKE_C_FLAGS	"${CMAKE_C_FLAGS} -O0 -Wall -Werror -fstack-clash-protection -fstack-protector -mstackrealign -g -g3")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,defs -Wl,-z,now")
+endif ()
 
-set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} -O0 -Wall -Wextra -Werror -fstack-clash-protection -fstack-protector -mstackrealign -g -g3")
-set(CMAKE_C_FLAGS	"${CMAKE_C_FLAGS} -O0 -Wall -Wextra -Werror -fstack-clash-protection -fstack-protector -mstackrealign -g -g3")
-
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+set(CMAKE_CXX_FLAGS	"${CMAKE_CXX_FLAGS} /Ox /EHa /EHc")
+set(CMAKE_C_FLAGS	"${CMAKE_C_FLAGS} /Ox /EHa /EHc")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DEBUG")
+endif ()
 
 # LIBRARY
 set(DUMMY_LIB "dummyl")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,defs -Wl,-z,now")
 
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+
+endif ()
 
 include_directories(libs/include)
 
@@ -24,6 +33,8 @@ file(GLOB HEADERS "libs/include/*.h*")
 # SOURCES
 file(GLOB SOURCES "libs/src/*.cpp*")
 
+  # Linux-specific stuff
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 # All the RPATH settings nust come above add_library() call
 # Use Build RPATH, don't skip it (usally Cmake would skip this by default)
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -33,6 +44,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 set(CMAKE_INSTALL_RPATH $ORIGIN)
 # Add automatic portions to RPATH
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif ()
 
 add_library(${DUMMY_LIB} SHARED ${SOURCES})
 
@@ -63,7 +75,7 @@ target_link_libraries(${DUMMY_APP}
 )
 
 
-# CPP_APP
+# C_APP
 set(DUMMY_APP_C "c-dummy-app")
 
 file(GLOB C_APP_SRCS "c_app/*.c")

@@ -1,6 +1,10 @@
-#include "dummy.hpp"
+
 
 #include <stdlib.h>
+
+#define DUMMYL_EXPORTS
+
+#include "dummy.hpp"
 #include "wrapper.h"
 
 // SPDX-License-Identifier : BSD-3-Clause-Attribution
@@ -23,13 +27,17 @@ void dummy_ops::reset_ops_count(void)
 	sub_ops_count = 0;
 }
 
-void create_dops_handle(dops_handle_t **ref)
+void create_dops_handle(dops_handle_t** ref)
 {
 	if (!ref)
 		return;
 
-	dops_handle_t *opaque;
-	opaque = (dops_handle_t *)calloc(1, sizeof(*opaque));
+	dops_handle_t* opaque;
+	opaque = (dops_handle_t*)calloc(1, sizeof(*opaque));
+	if (NULL == opaque) {
+		*ref = NULL;
+		return;
+	}
 	dummy_ops *dops_obj = new dummy_ops;
 	opaque->dops_ptr = dops_obj;
 	*ref = opaque;
